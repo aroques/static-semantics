@@ -8,6 +8,7 @@ class Stack
 {
 private:
     std::stack<Token> stack;
+    int find(std::stack <Token> s, std::string id_instance);
 
 public:
     Stack();
