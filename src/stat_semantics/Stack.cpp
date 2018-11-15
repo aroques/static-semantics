@@ -2,17 +2,17 @@
 
 Stack::Stack() {};
 
-void push(Token tk)
+void Stack::push(Token tk)
 {
-    return;
+    this->stack.push(tk);
 }
 
-void pop()
+void Stack::pop()
 {
-    return;
+    this->stack.pop();
 }
 
-int find(Token tk)
+int Stack::find(Token tk)
 {
     return 0;
 }
