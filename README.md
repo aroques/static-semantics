@@ -2,7 +2,7 @@
 
 A LL(1) recursive descent parser written in C++.
 
-This project adds static semantics verification on the parse tree.
+This project adds local scope static semantics verification on the parse tree.
 
 ## Usage
 
