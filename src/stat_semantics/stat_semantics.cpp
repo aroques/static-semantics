@@ -7,6 +7,8 @@
 static void traverse_preorder(Node* node, TokenStack& stack, std::stack<int>& var_cnt_stack);
 static void process_node(Node* node, TokenStack& stack, std::stack<int>& var_cnt_stack);
 static void process_node_tokens(Node* node, TokenStack& tk_stack, std::stack<int>& var_cnt_stack);
+static void verify_id_tk_definition(Token tk, TokenStack& tk_stack, std::stack<int>& var_cnt_stack);
+static void verify_id_tk_usage(Token tk, TokenStack& tk_stack, std::stack<int>& var_cnt_stack);
 static void print_error_and_exit(int line_no, std::string reason);
 static void postprocess_node(Node* node, TokenStack& stack, std::stack<int>& var_cnt_stack);
 
@@ -58,35 +60,35 @@ static void process_node(Node* node, TokenStack& tk_stack, std::stack<int>& var_
 
 static void process_node_tokens(Node* node, TokenStack& tk_stack, std::stack<int>& var_cnt_stack)
 {
-    if (node->label == "vars")
+    for (auto tk: node->tokens)
     {
-        // verify identifier token definitions
-        for (auto tk: node->tokens)
-        {
-            if (tk.type == IDENTIFIER_TK)
-            {
-                int tk_idx = tk_stack.find(tk);
+        if (tk.type != IDENTIFIER_TK)
+            continue;
+        
+        // process identifier token
+        if (node->label == "vars")
+            verify_id_tk_definition(tk, tk_stack, var_cnt_stack);
+        else 
+            verify_id_tk_usage(tk, tk_stack, var_cnt_stack); 
+    }
+}
 
-                if (var_cnt_stack.top() > 0 && tk_idx >= 0 && tk_idx < var_cnt_stack.top())
-                    print_error_and_exit(tk.line_number, "'" + tk.instance + "' is already defined in this block");
-                
-                tk_stack.push(tk);
-                var_cnt_stack.top()++;
-            }
-        }
-    }
-    else
-    {
-        // verify identifer usages
-        for (auto tk: node->tokens)
-        {
-            if (tk.type == IDENTIFIER_TK)
-            {
-                if (tk_stack.find(tk) < 0)
-                    print_error_and_exit(tk.line_number, "'" + tk.instance + "' has not been defined");
-            }
-        }
-    }
+static void verify_id_tk_definition(Token tk, TokenStack& tk_stack, std::stack<int>& var_cnt_stack)
+{
+    int tk_idx = tk_stack.find(tk);
+
+    if (var_cnt_stack.top() > 0 && tk_idx >= 0 && tk_idx < var_cnt_stack.top())
+        print_error_and_exit(tk.line_number, "'" + tk.instance + "' is already defined in this block");
+    
+    // token not previously defined, so push onto stack and count it
+    tk_stack.push(tk);
+    var_cnt_stack.top()++;
+}
+
+static void verify_id_tk_usage(Token tk, TokenStack& tk_stack, std::stack<int>& var_cnt_stack)
+{
+    if (tk_stack.find(tk) < 0)
+        print_error_and_exit(tk.line_number, "'" + tk.instance + "' has not been defined");
 }
 
 static void print_error_and_exit(int line_no, std::string reason)
