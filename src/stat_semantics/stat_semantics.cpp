@@ -7,7 +7,7 @@
 static void traverse_preorder(Node* node, Stack& stack, std::stack<int>& var_cnt_stack);
 static void process_node(Node* node, Stack& stack, std::stack<int>& var_cnt_stack);
 static void process_node_tokens(Node* node, Stack& tk_stack, std::stack<int>& var_cnt_stack);
-static void print_error_and_exit(Token tk, std::string reason);
+static void print_error_and_exit(int line_no, std::string reason);
 static void postprocess_node(Node* node, Stack& stack, std::stack<int>& var_cnt_stack);
 
 bool verify_semantics(Node* root)
@@ -68,7 +68,7 @@ static void process_node_tokens(Node* node, Stack& tk_stack, std::stack<int>& va
                 int tk_idx = tk_stack.find(tk);
 
                 if (var_cnt_stack.top() > 0 && tk_idx >= 0 && tk_idx < var_cnt_stack.top())
-                    print_error_and_exit(tk, "'" + tk.instance + "' is already defined in this block");
+                    print_error_and_exit(tk.line_number, "'" + tk.instance + "' is already defined in this block");
                 
                 tk_stack.push(tk);
                 var_cnt_stack.top()++;
@@ -83,15 +83,15 @@ static void process_node_tokens(Node* node, Stack& tk_stack, std::stack<int>& va
             if (tk.type == IDENTIFIER_TK)
             {
                 if (tk_stack.find(tk) < 0)
-                    print_error_and_exit(tk, "'" + tk.instance + "' has not been defined");
+                    print_error_and_exit(tk.line_number, "'" + tk.instance + "' has not been defined");
             }
         }
     }
 }
 
-static void print_error_and_exit(Token tk, std::string reason)
+static void print_error_and_exit(int line_no, std::string reason)
 {
-    print_error_and_exit("semantics error: line " + std::to_string(tk.line_number) + ": " + reason);
+    print_error_and_exit("semantics error: line " + std::to_string(line_no) + ": " + reason);
 }
 
 static void postprocess_node(Node* node, Stack& tk_stack, std::stack<int>& var_cnt_stack)
