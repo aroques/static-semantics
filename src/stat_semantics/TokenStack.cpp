@@ -1,24 +1,24 @@
-#include "stat_semantics/include/Stack.hpp"
+#include "stat_semantics/include/TokenStack.hpp"
 
-Stack::Stack() {};
+TokenStack::TokenStack() {};
 
-void Stack::push(Token tk)
+void TokenStack::push(Token tk)
 {
     this->stack.push(tk);
 }
 
-void Stack::pop()
+void TokenStack::pop()
 {
     this->stack.pop();
 }
 
-int Stack::find(Token tk)
+int TokenStack::find(Token tk)
 {
     std::stack<Token> stack_to_search = this->stack;
     return find(stack_to_search, tk.instance);
 }
 
-int Stack::find(std::stack <Token> s, std::string id_instance) 
+int TokenStack::find(std::stack <Token> s, std::string id_instance) 
 {
     int cnt = -1;
 

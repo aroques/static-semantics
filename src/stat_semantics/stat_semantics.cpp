@@ -1,18 +1,18 @@
 #include <iostream>
 
 #include "stat_semantics/include/stat_semantics.hpp"
-#include "stat_semantics/include/Stack.hpp"
+#include "stat_semantics/include/TokenStack.hpp"
 #include "error_handling/include/error_handling.hpp"
 
-static void traverse_preorder(Node* node, Stack& stack, std::stack<int>& var_cnt_stack);
-static void process_node(Node* node, Stack& stack, std::stack<int>& var_cnt_stack);
-static void process_node_tokens(Node* node, Stack& tk_stack, std::stack<int>& var_cnt_stack);
+static void traverse_preorder(Node* node, TokenStack& stack, std::stack<int>& var_cnt_stack);
+static void process_node(Node* node, TokenStack& stack, std::stack<int>& var_cnt_stack);
+static void process_node_tokens(Node* node, TokenStack& tk_stack, std::stack<int>& var_cnt_stack);
 static void print_error_and_exit(int line_no, std::string reason);
-static void postprocess_node(Node* node, Stack& stack, std::stack<int>& var_cnt_stack);
+static void postprocess_node(Node* node, TokenStack& stack, std::stack<int>& var_cnt_stack);
 
 bool verify_semantics(Node* root)
 {
-    Stack tk_stack;                         // Holds token definitions
+    TokenStack tk_stack;                         // Holds token definitions
     std::stack<int> var_cnt_stack ({0});    // Holds number of identifiers defined in each block. Top of stack holds number of variables defined in the current block.
     
     std::cout << "\nchecking static semantics..." << std::endl;
@@ -24,7 +24,7 @@ bool verify_semantics(Node* root)
     return true;
 }
 
-static void traverse_preorder(Node* node, Stack& tk_stack, std::stack<int>& var_cnt_stack)
+static void traverse_preorder(Node* node, TokenStack& tk_stack, std::stack<int>& var_cnt_stack)
 {
     if (node == NULL) 
         return;
@@ -43,7 +43,7 @@ static void traverse_preorder(Node* node, Stack& tk_stack, std::stack<int>& var_
     return;
 }
 
-static void process_node(Node* node, Stack& tk_stack, std::stack<int>& var_cnt_stack)
+static void process_node(Node* node, TokenStack& tk_stack, std::stack<int>& var_cnt_stack)
 {
     if (node->label == "block")
         // entering new block, so start new var count
@@ -56,7 +56,7 @@ static void process_node(Node* node, Stack& tk_stack, std::stack<int>& var_cnt_s
     process_node_tokens(node, tk_stack, var_cnt_stack);
 }
 
-static void process_node_tokens(Node* node, Stack& tk_stack, std::stack<int>& var_cnt_stack)
+static void process_node_tokens(Node* node, TokenStack& tk_stack, std::stack<int>& var_cnt_stack)
 {
     if (node->label == "vars")
     {
@@ -94,7 +94,7 @@ static void print_error_and_exit(int line_no, std::string reason)
     print_error_and_exit("semantics error: line " + std::to_string(line_no) + ": " + reason);
 }
 
-static void postprocess_node(Node* node, Stack& tk_stack, std::stack<int>& var_cnt_stack)
+static void postprocess_node(Node* node, TokenStack& tk_stack, std::stack<int>& var_cnt_stack)
 {
     if (node->label == "block")
     {

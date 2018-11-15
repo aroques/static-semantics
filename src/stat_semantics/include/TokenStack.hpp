@@ -1,21 +1,21 @@
-#ifndef STACK_HPP
-#define STACK_HPP
+#ifndef TOKEN_STACK_HPP
+#define TOKEN_STACK_HPP
 
 #include "scanner/include/token.hpp"
 #include <stack>
 
-class Stack
+class TokenStack
 {
 private:
     std::stack<Token> stack;
     int find(std::stack <Token> s, std::string id_instance);
 
 public:
-    Stack();
+    TokenStack();
 
     void push(Token tk);
     void pop();
     int find(Token tk);
 };
 
-#endif // !STACK_HPP
+#endif // !TOKEN_STACK_HPP
